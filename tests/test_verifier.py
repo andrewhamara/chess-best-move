@@ -117,26 +117,6 @@ def test_checks_read_board_calls() -> None:
     assert verify_output(2, found)["valid"] is False
 
 
-def test_checks_legal_moves_calls() -> None:
-    from contract import MovesInput
-    from plugin import legal_moves
-
-    given, output = TOOLS[Tool.LEGAL_MOVES]
-    assert verifier.verify_input("legal_moves", build_output({"board": 1, "to_move": "white"}, given))["valid"]
-    assert not verifier.verify_input("legal_moves", build_output({"board": 99, "to_move": "white"}, given))["valid"]
-    side = PUZZLES[1]["to_move"]
-    found = plain_output(legal_moves(build_output({"board": 1, "to_move": side}, MovesInput), Path(".")))
-
-    def verify_output(made: dict, to_move: str = side) -> dict:
-        return verifier.verify_output("legal_moves", build_output({"board": 1, "to_move": to_move}, given), build_output(made, output), ".")
-
-    assert verify_output(found)["valid"] is True
-    assert verify_output(found | {"checks": found["checks"][1:]})["valid"] is False
-    assert verify_output(found | {"others": [*found["others"], "a1a2"]})["valid"] is False
-    other = "black" if side == "white" else "white"
-    assert "it is" in verify_output(found | {"to_move": other}, other)["message"]
-
-
 def test_the_show_board_task_is_judged_as_its_tool() -> None:
     found = plain_output(read_board(BoardInput(board=5), Path(".")))
     given, made = TASKS[Task.SHOW_BOARD]
@@ -146,21 +126,3 @@ def test_the_show_board_task_is_judged_as_its_tool() -> None:
 
 def test_the_verdict_is_the_same_twice() -> None:
     assert judge(3, "white", "a1a2") == judge(3, "white", "a1a2")
-
-
-def test_checks_consider_move_calls() -> None:
-    from contract import ConsiderInput
-    from plugin import consider_move
-
-    given, output = TOOLS[Tool.CONSIDER_MOVE]
-    side = PUZZLES[1]["to_move"]
-    asked = {"board": 1, "to_move": side, "move": PUZZLES[1]["best"][0], "note": "a check"}
-    found = plain_output(consider_move(build_output(asked, ConsiderInput), Path(".")))
-
-    def verify_output(made: dict) -> dict:
-        return verifier.verify_output("consider_move", build_output(asked, given), build_output(made, output), ".")
-
-    assert verify_output(found)["valid"] is True
-    assert "misreported" in verify_output(found | {"black": found["black"][:-1]})["message"]
-    assert verify_output(found | {"note": "another note"})["valid"] is False
-    assert not verifier.verify_input("consider_move", build_output(asked | {"note": "x" * 301}, given))["valid"]

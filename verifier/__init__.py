@@ -1,18 +1,16 @@
 """The deterministic verifier: each tool's checks live in its own module, on contract instances.
 
 It holds the ground truth, verifier/puzzles.py: each board's position, every legal move and every
-move that forces mate in the fewest moves. Nothing else holds the answers: the plugin's tools read
-the board's pixels and list the legal moves by the rules, and never know which move is best.
+move that forces mate in the fewest moves. Nothing else holds the answers: the plugin's one tool reads
+the board's pixels and never knows which move is best.
 """
 
 from contract import Task, Tool
 
-from . import consider_move, moves, read_board, task
+from . import read_board, task
 
 TOOLS = {
     Tool.READ_BOARD: read_board,
-    Tool.LEGAL_MOVES: moves,
-    Tool.CONSIDER_MOVE: consider_move,
 }
 
 
@@ -25,8 +23,6 @@ def _tool_output(module):
 TASKS = {
     Task.BEST_MOVE: task.verify_task,
     Task.SHOW_BOARD: _tool_output(read_board),
-    Task.LIST_MOVES: _tool_output(moves),
-    Task.CONSIDER_MOVE: _tool_output(consider_move),
 }
 
 

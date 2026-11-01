@@ -30,4 +30,3 @@
 .chess-verdict { font-weight: 700; font-size: 16px; }
 .chess-verdict.ok { color: var(--ok); }
 .chess-verdict.bad { color: var(--bad); }
-.chess-note { font-size: 13.5px; font-style: italic; color: var(--muted); overflow-wrap: anywhere; }

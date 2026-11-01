@@ -1,7 +1,7 @@
 _ > nanoagent.plugin.v0001.ManifestConfig:
 id: chess-best-move
 name: Chess Best Move
-version: 0.2.0
+version: 0.3.0
 status: ready
 spec: nanoagent.plugin/v0001
 
@@ -19,40 +19,20 @@ permissions > nanoagent.plugin.v0001.PermissionsConfig:
 tools > dict[contract.Tool, nanoagent.plugin.v0001.ToolConfig]:
   read_board:
     description: Read the position on a bundled chess board image, square by square from its pixels, as each side's pieces by square; it never says which move is best
-  legal_moves:
-    description: List every legal move on a bundled board for the side to move, in UCI, the checks apart from the rest; it never says which move is best
-  consider_move:
-    description: A reasoning step on a bundled board, one candidate move and a note at a time; it gives back only the position after the move and never says whether the move is good
 
 # One entry per contract.Task; its input and output classes are contract.TASKS's.
 tasks > dict[contract.Task, nanoagent.plugin.v0001.TaskConfig]:
   best-move:
-    description: Find the best move on a chess board image for the side to move
+    description: Find the mating move on a chess board image for the side to move. The agent can run out of room and end without an answer; then run this task again, up to three times, and never work out a move yourself
     runner: agent
-    tools: [read_board, consider_move]
+    tools: [read_board]
     reference: null
     instructions: |-
-      Steps. You have exactly 6 steps: (1) read_board, (2 to 5) consider_move, one candidate per step, (6) submit. You can explore at most four moves, so pick them well, and always submit.
-      Look. read_board lists each side's pieces by square (e.g. Kd3, Bd2, Pa2: K Q R B N P are king, queen, rook, bishop, knight, pawn). Neither side can castle or capture en passant.
-      Goal. The side to move (to_move) can checkmate in one move. The best move is that mating move.
-      Consider. consider_move is your thinking step: give it one candidate (a move in UCI: from square, to square, e.g. a2a1) and a one-line note, and it gives back the position after that move; it never says whether the move is good. Right after read_board, pick your first candidate in a few lines and call consider_move; do not analyze every move. In each later step think about one move only: in the new position, is the other king in check with no legal escape, block or capture? If yes, submit it; if not, consider the next candidate.
-      Room. Each reply, thinking included, ends after about 1,500 words, and an answer cut off scores nothing: think about one move in a few short lines, then call the next tool.
-      Submit. Call submit with the board and to_move, as given, and the move in UCI.
+      Call read_board once with the board. It lists each side's pieces by square (e.g. Kd3, Bd2, Pa2: K Q R B N P are king, queen, rook, bishop, knight, pawn). The side to move (to_move) has a checkmate in one move.
+      Do not reason, analyze or check variations. As soon as read_board answers, pick the mating move on instinct and call submit with the board and to_move, as given, and the move in UCI (from square, to square, e.g. a2a1). Your first reply after read_board must be the submit call, with no thinking before it.
   show-board:
-    description: Show one of the board images, 1 to 50; use it whenever the person wants to see a board
+    description: Show one of the board images, 1 to 50, only when the person asks to see a board; it does not find moves
     runner: tool
     tools: [read_board]
     reference: null
     instructions: Call read_board with the board, 1 to 50, and return its rows.
-  list-moves:
-    description: List the legal moves on one of the boards for the side to move
-    runner: tool
-    tools: [legal_moves]
-    reference: null
-    instructions: Call legal_moves with the board, 1 to 50, and the side to move.
-  consider-move:
-    description: Show a move on one of the boards, drawn on the board, and the position after it
-    runner: tool
-    tools: [consider_move]
-    reference: null
-    instructions: Call consider_move with the board, the side to move, the move in UCI and a short note.

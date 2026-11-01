@@ -13,7 +13,7 @@ from mcp.server.stdio import stdio_server
 from slimconfig import build_output, output_schema, plain_output
 
 from contract import TOOLS, Tool
-from plugin import consider_move, legal_moves, read_board
+from plugin import read_board
 
 server = Server("chess-best-move")
 # NanoAgent names the one folder this plugin may write to.
@@ -21,8 +21,6 @@ WORKSPACE_ENV = "NANOAGENT_WORKSPACE"
 # Each tool's implementation: (its input, the workspace) -> its output, as contract.TOOLS types them.
 IMPLEMENTATIONS = {
     Tool.READ_BOARD: read_board,
-    Tool.LEGAL_MOVES: legal_moves,
-    Tool.CONSIDER_MOVE: consider_move,
 }
 
 

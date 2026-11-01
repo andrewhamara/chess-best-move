@@ -1,8 +1,7 @@
 // How this plugin's page draws its outputs: the board image (ui/boards/) with an SVG drawn over it as
 // a data: image. A best-move answer leads with the agent's move and the correct one, draws the agent's
 // move as an orange arrow and, when it is wrong, the correct move as a dashed green one, with the
-// verdict's checks folded away. A consider_move card draws the move the agent is weighing, so the page
-// shows the agent's moves even when it ends without an answer; legal_moves shows a short summary.
+// verdict's checks folded away. show-board shows a board and the piece lists the agent reads.
 import { disclosure, h } from "./kit/components.js";
 
 const SIZE = 496;
@@ -63,21 +62,6 @@ const checks = (constraints) =>
   );
 
 export default {
-  MovesOutput: ({ board, to_move, checks, others }) =>
-    h(
-      "div",
-      { class: "chess-card" },
-      h("p", { class: "chess-move" }, `Board ${board}, ${to_move} to move: ${checks.length + others.length} legal moves, ${checks.length} of them checks`),
-      checks.length ? h("p", { class: "chess-pieces muted", text: `Checks: ${checks.join(", ")}` }) : null,
-    ),
-  ConsiderOutput: ({ board, to_move, move, note }) =>
-    h(
-      "div",
-      { class: "chess-card" },
-      h("p", { class: "chess-move" }, h("span", { class: "muted", text: `Board ${board}, ${to_move} to move · considering ` }), h("strong", { text: move })),
-      note ? h("p", { class: "chess-note", text: `“${note}”` }) : null,
-      picture(board, [arrow(move, AGENT, "considered", false)]),
-    ),
   BoardOutput: ({ board, white, black }) =>
     h(
       "div",

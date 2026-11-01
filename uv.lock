@@ -344,10 +344,9 @@ wheels = [
 
 [[package]]
 name = "nanoagent-chess-best-move"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
-    { name = "chess" },
     { name = "mcp" },
     { name = "pillow" },
     { name = "slimconfig" },
@@ -355,13 +354,14 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
+    { name = "chess" },
     { name = "pytest" },
     { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "chess", specifier = ">=1.10,<2" },
+    { name = "chess", marker = "extra == 'dev'", specifier = ">=1.10,<2" },
     { name = "mcp", specifier = ">=1.27,<2" },
     { name = "pillow", specifier = ">=11,<13" },
     { name = "pytest", marker = "extra == 'dev'" },

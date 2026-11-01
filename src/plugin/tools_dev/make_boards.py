@@ -202,29 +202,21 @@ def main() -> None:
                 raise SystemExit(f"{path}: read_board does not read back the position drawn")
         side = "white" if board.turn == chess.WHITE else "black"
         legal = sorted(move.uci() for move in board.legal_moves)
-        checks = sorted(move.uci() for move in board.legal_moves if board.gives_check(move))
-        after = {}
-        for move in list(board.legal_moves):
-            board.push(move)
-            after[move.uci()] = tuple(row.replace(" ", "") for row in str(board).splitlines())
-            board.pop()
-        truth.append((number, puzzle, board.fen(), side, depth, best, legal, checks, after, rows))
+        truth.append((number, puzzle, board.fen(), side, depth, best, legal, rows))
     lines = [
         '"""Each bundled board\'s position and answers, as src/plugin/tools_dev/make_boards.py computed them from',
         "Lichess puzzles (CC0) with python-chess. Generated: do not edit.",
         "",
         "best: every move that forces checkmate in mate_in moves, the fewest possible; legal: every legal move;",
-        "checks: the legal moves that give check; after: the position after each legal move, as rows;",
         'rows: the position as read_board gives it."""',
         "",
         f"COUNT = {COUNT}",
         "PUZZLES = {",
     ]
-    for number, puzzle, fen, side, depth, best, legal, checks, after, rows in truth:
+    for number, puzzle, fen, side, depth, best, legal, rows in truth:
         lines.append(
             f"    {number}: {{'lichess': {puzzle!r}, 'fen': {fen!r}, 'to_move': {side!r}, 'mate_in': {depth}, "
-            f"'best': {tuple(best)!r}, 'legal': {tuple(legal)!r}, 'checks': {tuple(checks)!r}, 'rows': {tuple(rows)!r}, "
-            f"'after': {dict(sorted(after.items()))!r}}},"
+            f"'best': {tuple(best)!r}, 'legal': {tuple(legal)!r}, 'rows': {tuple(rows)!r}}},"
         )
     lines.append("}")
     TRUTH.write_text("\n".join(lines) + "\n")
