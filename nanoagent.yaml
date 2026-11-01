@@ -1,0 +1,39 @@
+_ > nanoagent.plugin.v0001.ManifestConfig:
+id: chess-best-move
+name: Chess Best Move
+version: 0.1.0
+status: ready
+spec: nanoagent.plugin/v0001
+
+runtime > nanoagent.plugin.v0001.RuntimeConfig:
+  type: mcp_stdio
+  command: [uv, run, --frozen, python, -m, plugin]
+
+permissions > nanoagent.plugin.v0001.PermissionsConfig:
+  network > nanoagent.plugin.v0001.NetworkConfig:
+    hosts: []
+  filesystem > nanoagent.plugin.v0001.FilesystemConfig:
+    write: [workspace]
+
+# One entry per contract.Tool; its input and output classes are contract.TOOLS's.
+tools > dict[contract.Tool, nanoagent.plugin.v0001.ToolConfig]:
+  read_board:
+    description: Read the position on a bundled chess board image, square by square from its pixels, as 8 rows of piece letters; it never says which move is best
+
+# One entry per contract.Task; its input and output classes are contract.TASKS's.
+tasks > dict[contract.Task, nanoagent.plugin.v0001.TaskConfig]:
+  best-move:
+    description: Find the best move on a chess board image for the side to move
+    runner: agent
+    tools: [read_board]
+    reference: null
+    instructions: |-
+      Look. Call read_board once with the board. It gives the position as 8 rows, rank 8 first and rank 1 last, files a to h from left to right: K Q R B N P are white's king, queen, rook, bishop, knight and pawn, k q r b n p black's, and '.' an empty square. Neither side can castle or capture en passant.
+      Goal. The side to move (to_move) can force checkmate. The best move is a move that forces checkmate in the fewest moves. Look at forcing moves first, checks above all, and make sure every defense still loses.
+      Submit. Call submit with the board and to_move, as given, and the move in UCI: the from square, then the to square, e.g. g1f3; add q, r, b or n for a promotion, e.g. e7e8q. Keep your reasoning short: your reply is limited.
+  show-board:
+    description: Show one of the board images, 1 to 50; use it whenever the person wants to see a board
+    runner: tool
+    tools: [read_board]
+    reference: null
+    instructions: Call read_board with the board, 1 to 50, and return its rows.
