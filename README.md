@@ -2,9 +2,9 @@
 
 A `nanoagent.plugin/v0001` plugin: find the best move on a chess board image.
 Each of 50 bundled boards is a position from a real game, a Lichess puzzle
-with one forced checkmate in one or two moves. The agent's tool reads the
-board's pixels and returns the position as text; the agent must find the move
-itself. The verifier holds every legal move and every move that forces the
+with one forced checkmate in one or two moves. One tool reads the board's
+pixels and returns the position as text, another lists the legal moves; the
+agent must find the move that forces mate itself. The verifier holds every legal move and every move that forces the
 fastest mate, computed exactly by exhaustive search, and checks the agent's
 move against them.
 
@@ -12,14 +12,15 @@ move against them.
 
 | Tool | Does | Code |
 |---|---|---|
-| `read_board` | Reads the position on a board image square by square, each square matched exactly against the 26 a board can hold (12 pieces and empty, on light and dark squares), as 8 rows of piece letters, rank 8 first. It never says which move is best | `src/plugin/read_board.py` |
+| `read_board` | Reads the position on a board image square by square, each square matched exactly against the 26 a board can hold (12 pieces and empty, on light and dark squares), and lists each side's pieces by square, e.g. `Kd3, Bd2, Pa2`. It never says which move is best | `src/plugin/read_board.py` |
+| `legal_moves` | Lists every legal move for the side to move in UCI, the checks apart from the rest. It follows from the rules alone (python-chess on the position read from the image) and never says which move is best | `src/plugin/moves.py` |
 
 ### Tasks
 
 | Task | Does | Runner |
 |---|---|---|
-| `best-move` | Finds the best move on a board for the side to move, e.g. "find the best move on board 7, white to move" | `agent`, with `read_board`; no reference (the verifier holds the answers) |
-| `show-board` | Shows a board and the rows the agent reads | `tool` (`read_board`) |
+| `best-move` | Finds the best move on a board for the side to move, e.g. "find the best move on board 7, white to move" | `agent`, with `read_board` and `legal_moves`; no reference (the verifier holds the answers) |
+| `show-board` | Shows a board and the piece lists the agent reads | `tool` (`read_board`) |
 
 The page draws each result on the board (`ui/renderers.js`): the agent's move
 as an orange arrow and, when it is not the best move, the forced mate's first
@@ -38,8 +39,9 @@ them changes no answer.
 
 The positions are 50 puzzles from the [Lichess puzzle
 database](https://database.lichess.org/#puzzles) (CC0): the first 25 mate-in-1
-and 25 mate-in-2 puzzles with popularity 90 or more and 5,000 plays or more,
-listed with their Lichess ids in `src/plugin/tools_dev/make_boards.py`. For
+and 25 mate-in-2 puzzles with 10 pieces or fewer, popularity 90 or more and
+2,000 plays or more, listed with their Lichess ids in
+`src/plugin/tools_dev/make_boards.py`. For
 each, the generator computes with python-chess, by exhaustive search, every
 legal move and every move that forces mate in the fewest moves, and writes
 them to `verifier/puzzles.py`. On all 50 boards that is exactly one move,
@@ -64,12 +66,14 @@ order. Each entry of `details.constraints` is
 | 6 | `best` | The move forces checkmate in the fewest moves possible |
 
 A best move scores 1. A legal move that is not best scores 0.25. Anything
-else, an illegal move or a failure of 1 to 4, scores 0. `read_board`'s every
-output is checked too: its rows must be the board's position.
+else, an illegal move or a failure of 1 to 4, scores 0. Every tool output is
+checked too: `read_board`'s pieces must be the board's position, and
+`legal_moves`'s lists its legal moves and checks.
 
 ## Limitations
 
 - **Forced mates only.** "Best" is defined where it can be decided exactly: positions with a forced mate in one or two moves. Positions won by other means would need an engine's judgment.
+- **Small positions, because of the model's reply limit.** RUSH Lab's model must find and submit a move within one 2,048-token reply, reasoning included. On full-size puzzles (about 16 pieces) it ran out of that reply every time, even on mates in 1, even given the legal moves; on a 6-piece mate in 1 it finished in 853 tokens with the legal moves and in 1,738 without. So the boards have 10 pieces or fewer, and `legal_moves` does the rules so the agent can spend its reply on the search.
 - **The agent never sees pixels.** It reasons over the position as text; the board reader does the seeing, on these rendered boards only.
 - **White is always at the bottom,** and castling and en passant are never available.
 - **A fixed set of 50 boards** could in principle be memorized.
@@ -88,12 +92,12 @@ Apple Symbols font.
 ├── contract.py      # each tool's and task's typed input and output: slimconfig Output classes
 ├── README.md
 ├── LICENSE
-├── pyproject.toml   # pillow reads the boards; python-chess (dev only) builds them and their answers
+├── pyproject.toml   # pillow reads the boards; python-chess lists legal moves and builds the answers
 ├── uv.lock
 ├── .gitignore
 ├── .env             # needed environment variable names (none here)
-├── src/plugin/      # the MCP server (__main__.py), read_board.py, and tools_dev/make_boards.py
-├── tests/           # the reader, the answers against Lichess and python-chess, the verifier, scripted agents
+├── src/plugin/      # the MCP server (__main__.py), read_board.py, moves.py, and tools_dev/make_boards.py
+├── tests/           # the reader, legal moves, the answers against Lichess and python-chess, the verifier, scripted agents
 ├── ui/              # boards/ (the 50 PNGs), pieces.png (the sprites), renderers.js/.css (moves on the board)
 ├── product/         # the product page a catalog shows: product.yaml and icon.svg
 └── verifier/        # deterministic verifier: puzzles.py (the answers), one module per tool, and task.py

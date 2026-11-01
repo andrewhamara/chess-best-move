@@ -1,41 +1,24 @@
 """Scripted agents, no model, each run as NanoAgent runs the task: read_board, then submit.
 
-An exact agent, which knows the answers, must pass every board. A greedy agent reads only what the
-model reads, read_board's rows, and plays the first move that gives check (by python-chess, from the
-rows and the side to move); its verdicts must agree with whether that move is the forced mate.
+An exact agent, which knows the answers, must pass every board. A greedy agent sees only what the
+model sees and plays legal_moves's first check (or its first move when there is none); its verdicts
+must agree with whether that move is the forced mate.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-import chess
 from helpers import judge
 
-from contract import BoardInput
-from plugin import read_board
+from contract import MovesInput, Side
+from plugin import legal_moves
 from verifier.puzzles import PUZZLES
 
 
 def first_check(number: int, side: str) -> str:
-    rows = read_board(BoardInput(board=number), Path(".")).rows
-    board = chess.Board(_fen(rows, side))
-    checks = [m.uci() for m in board.legal_moves if board.gives_check(m)]
-    return min(checks) if checks else min(m.uci() for m in board.legal_moves)
-
-
-def _fen(rows: list[str], side: str) -> str:
-    ranks = []
-    for row in rows:
-        out, empty = "", 0
-        for char in row:
-            if char == ".":
-                empty += 1
-            else:
-                out += (str(empty) if empty else "") + char
-                empty = 0
-        ranks.append(out + (str(empty) if empty else ""))
-    return "/".join(ranks) + (" w" if side == "white" else " b") + " - - 0 1"
+    moves = legal_moves(MovesInput(board=number, to_move=Side(side)), Path("."))
+    return (moves.checks or moves.others)[0]
 
 
 def test_an_exact_agent_passes_every_board() -> None:

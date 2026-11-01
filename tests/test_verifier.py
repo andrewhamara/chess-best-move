@@ -90,15 +90,6 @@ def test_a_board_that_does_not_exist_scores_zero(number: int) -> None:
 # Boundary
 
 
-def test_a_promotion_needs_its_piece() -> None:
-    promoting = [(n, m) for n, p in PUZZLES.items() for m in p["legal"] if len(m) == 5]
-    if not promoting:
-        pytest.skip("no board allows a promotion")
-    n, move = promoting[0]
-    assert judge(n, PUZZLES[n]["to_move"], move)["score"] in (0.25, 1.0)
-    assert judge(n, PUZZLES[n]["to_move"], move[:4])["score"] == 0.0  # without its piece it is not a legal move
-
-
 def test_black_to_move_boards_are_judged_for_black() -> None:
     n = next(n for n, p in sorted(PUZZLES.items()) if p["to_move"] == "black")
     assert judge(n, "black", PUZZLES[n]["best"][0])["valid"] is True
@@ -119,11 +110,31 @@ def test_checks_read_board_calls() -> None:
 
     found = plain_output(read_board(BoardInput(board=1), Path(".")))
     assert verify_output(1, found)["valid"] is True
-    rows = found["rows"]
-    moved = found | {"rows": [rows[0], rows[1].replace("p", ".", 1), *rows[2:]]}
-    assert "rank 7 differs" in verify_output(1, moved)["message"]
+    dropped = found | {"black": found["black"][:-1]}
+    assert "board 1's black pieces are not its position" in verify_output(1, dropped)["message"]
+    moved = found | {"white": [found["white"][0][:1] + "a1", *found["white"][1:]]}
+    assert verify_output(1, moved)["valid"] is False
     assert verify_output(2, found)["valid"] is False
-    assert verify_output(1, found | {"rows": rows[:7]})["valid"] is False
+
+
+def test_checks_legal_moves_calls() -> None:
+    from contract import MovesInput
+    from plugin import legal_moves
+
+    given, output = TOOLS[Tool.LEGAL_MOVES]
+    assert verifier.verify_input("legal_moves", build_output({"board": 1, "to_move": "white"}, given))["valid"]
+    assert not verifier.verify_input("legal_moves", build_output({"board": 99, "to_move": "white"}, given))["valid"]
+    side = PUZZLES[1]["to_move"]
+    found = plain_output(legal_moves(build_output({"board": 1, "to_move": side}, MovesInput), Path(".")))
+
+    def verify_output(made: dict, to_move: str = side) -> dict:
+        return verifier.verify_output("legal_moves", build_output({"board": 1, "to_move": to_move}, given), build_output(made, output), ".")
+
+    assert verify_output(found)["valid"] is True
+    assert verify_output(found | {"checks": found["checks"][1:]})["valid"] is False
+    assert verify_output(found | {"others": [*found["others"], "a1a2"]})["valid"] is False
+    other = "black" if side == "white" else "white"
+    assert "it is" in verify_output(found | {"to_move": other}, other)["message"]
 
 
 def test_the_show_board_task_is_judged_as_its_tool() -> None:

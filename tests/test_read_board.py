@@ -8,7 +8,7 @@ from PIL import Image
 
 from contract import BoardInput
 from plugin import read_board
-from plugin.read_board import SIZE, read_rows, templates
+from plugin.read_board import SIZE, _rows, pieces, read_rows, templates
 from verifier.puzzles import PUZZLES
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,10 +16,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.mark.parametrize("number", sorted(PUZZLES))
 def test_reads_each_boards_position_from_its_pixels(tmp_path: Path, number: int) -> None:
-    rows = read_board(BoardInput(board=number), tmp_path).rows
+    rows = list(_rows(number))
     assert rows == list(PUZZLES[number]["rows"])
     # The rows are the position in the puzzle's FEN, as python-chess draws it.
     assert rows == [row.replace(" ", "") for row in str(chess.Board(PUZZLES[number]["fen"])).splitlines()]
+    found = read_board(BoardInput(board=number), tmp_path)
+    board = chess.Board(PUZZLES[number]["fen"])
+    for color, listed in ((chess.WHITE, found.white), (chess.BLACK, found.black)):
+        expected = {p.symbol().upper() + chess.square_name(s) for s, p in board.piece_map().items() if p.color == color}
+        assert set(listed) == expected and len(listed) == len(expected)
+        assert listed[0][0] == "K"
+    assert found.white == pieces(rows, True) and found.black == pieces(rows, False)
 
 
 def test_the_26_square_templates_are_all_different() -> None:

@@ -18,19 +18,22 @@ permissions > nanoagent.plugin.v0001.PermissionsConfig:
 # One entry per contract.Tool; its input and output classes are contract.TOOLS's.
 tools > dict[contract.Tool, nanoagent.plugin.v0001.ToolConfig]:
   read_board:
-    description: Read the position on a bundled chess board image, square by square from its pixels, as 8 rows of piece letters; it never says which move is best
+    description: Read the position on a bundled chess board image, square by square from its pixels, as each side's pieces by square; it never says which move is best
+  legal_moves:
+    description: List every legal move on a bundled board for the side to move, in UCI, the checks apart from the rest; it never says which move is best
 
 # One entry per contract.Task; its input and output classes are contract.TASKS's.
 tasks > dict[contract.Task, nanoagent.plugin.v0001.TaskConfig]:
   best-move:
     description: Find the best move on a chess board image for the side to move
     runner: agent
-    tools: [read_board]
+    tools: [read_board, legal_moves]
     reference: null
     instructions: |-
-      Look. Call read_board once with the board. It gives the position as 8 rows, rank 8 first and rank 1 last, files a to h from left to right: K Q R B N P are white's king, queen, rook, bishop, knight and pawn, k q r b n p black's, and '.' an empty square. Neither side can castle or capture en passant.
-      Goal. The side to move (to_move) can force checkmate. The best move is a move that forces checkmate in the fewest moves. Look at forcing moves first, checks above all, and make sure every defense still loses.
-      Submit. Call submit with the board and to_move, as given, and the move in UCI: the from square, then the to square, e.g. g1f3; add q, r, b or n for a promotion, e.g. e7e8q. Keep your reasoning short: your reply is limited.
+      Look. Call read_board with the board: it lists each side's pieces by square (white and black, e.g. Kd3, Bd2, Pa2: K Q R B N P are king, queen, rook, bishop, knight, pawn). Then call legal_moves with the board and to_move: it lists every legal move in UCI, the checks apart from the rest. Neither side can castle or capture en passant.
+      Goal. The side to move (to_move) can force checkmate. The best move is a move that forces checkmate in the fewest moves. Look at the checks first, and make sure every defense still loses.
+      Room. Your reply, thinking included, ends after about 1,500 words, and an answer cut off scores nothing: think in at most 10 short lines. For each check, ask only whether the king can step away, block or capture; do not list every square or every move.
+      Submit. Call submit with the board and to_move, as given, and the move in UCI, as legal_moves lists it.
   show-board:
     description: Show one of the board images, 1 to 50; use it whenever the person wants to see a board
     runner: tool

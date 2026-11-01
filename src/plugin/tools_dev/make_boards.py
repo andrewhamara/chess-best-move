@@ -3,8 +3,9 @@
     uv run python -m plugin.tools_dev.make_boards
 
 The positions are 50 puzzles from the Lichess puzzle database (database.lichess.org, CC0): the first
-25 mate-in-1 and 25 mate-in-2 puzzles in it with popularity 90 or more and 5,000 plays or more that
-stay clean below, listed in PUZZLES as Lichess gives them. A puzzle's position is its FEN after the
+25 mate-in-1 and 25 mate-in-2 puzzles in it with 10 pieces or fewer, popularity 90 or more and 2,000
+plays or more that stay clean below, listed in PUZZLES as Lichess gives them. Few pieces keep a
+position within what RUSH Lab's model can work through in one 2,048-token reply. A puzzle's position is its FEN after the
 opponent's first move, with castling and en passant rights removed (an image cannot show them), and
 is kept only if that removal changes no answer. Its answers are computed exactly by exhaustive search with python-chess:
 the best moves are every move that forces checkmate in the fewest moves (1 or 2), and the legal
@@ -41,56 +42,56 @@ SEED = 4804
 # (Lichess puzzle id, FEN, the opponent's first move, Lichess's solution move): 25 mates in 1, then 25
 # mates in 2.
 PUZZLES = [
-    ('00Mbv', '2k2b1r/pp3ppp/1n6/BN2p1P1/2Q1Nn1P/8/PP3P2/2KR4 b - - 0 24', 'b6c4', 'd1d8'),
     ('00VIe', '8/8/8/P6p/8/2RnkN2/r7/3K4 w - - 1 60', 'f3e1', 'a2d2'),
-    ('00y2j', '3r4/1pB3kp/2b1Pp2/1pN2RpK/1P6/7P/6r1/8 w - - 0 34', 'c7d8', 'c6e8'),
-    ('015mX', 'r3k2r/1ppqb2p/p1b1N1p1/3pPR2/3P2Q1/2P5/PP4PP/RNB3K1 b kq - 0 14', 'g6f5', 'g4h5'),
-    ('01bwq', 'r1b2k1r/pppq1ppp/1n6/1B1PQ1B1/8/2P5/P4PPP/R3K2R b KQ - 2 15', 'd7d6', 'e5e8'),
-    ('01p5M', '1r6/p1p2n2/1pk2Pp1/6r1/8/2N5/PPP4K/3R1R2 w - - 2 24', 'f1g1', 'b8h8'),
-    ('021U1', 'r7/bp6/4kNQ1/1b2Pp1p/p2R1P1N/P1q2K2/6PP/7R w - - 5 31', 'f3f2', 'a7d4'),
-    ('0257T', 'r2qnr1k/pppb2pp/2n2b1B/3NN3/8/P5QP/1PP1B1P1/R4RK1 b - - 0 18', 'f6e5', 'f1f8'),
-    ('030I0', '5r2/4r1k1/3p1pbp/1Pp5/2P5/P2PqR1B/4P2p/1R2QK2 w - - 0 32', 'h3g2', 'e3g1'),
-    ('053dH', 'rn2kb1r/pQp1pppp/8/4q3/2b5/8/PP1PBPPP/R1B1K1NR b KQkq - 0 8', 'c4d5', 'b7c8'),
-    ('056MT', '1rr3k1/2qN1p2/b3pbpQ/n1p5/P1P2P2/P3P2R/1B4PP/R5K1 b - - 1 23', 'f6b2', 'h6h7'),
-    ('05CJZ', '8/2k2p1r/1p2p2P/p2pPnP1/P2P1PKB/2P1n3/5R2/4R3 w - - 10 47', 'g4h5', 'f5g7'),
-    ('05StG', 'r2q1r1k/pp2b1pp/8/2p1Np2/2BpP1b1/P2P4/2P2PK1/R1BQ3R b - - 1 17', 'g4d1', 'e5g6'),
-    ('060cV', 'r1bk3r/1p3R1p/pR1Bp1p1/3p4/B1nP4/2K1P3/P4PPP/8 b - - 2 23', 'c4b6', 'd6c7'),
-    ('06W3x', '1b6/2p5/P1B5/1P6/1K1P1Q1k/4P3/3n4/2q5 b - - 2 45', 'h4h5', 'c6e8'),
-    ('074gd', '2k2q2/1pp5/p1p5/4p1Rp/4N2n/3P3P/PPP2P1K/R7 w - - 2 26', 'h2g3', 'f8f4'),
-    ('07IW0', 'r1bq1b1r/ppp2Q1p/2n1kn2/4N3/3Pp3/8/PPP2PPP/R1B1K2R b KQ - 3 12', 'e6f5', 'g2g4'),
-    ('07Syw', '6k1/p4pp1/4p2p/8/P3Pq2/7B/3Q1P1n/4RK2 w - - 1 31', 'f1e2', 'f4f3'),
-    ('08jJr', '1r1r2k1/2p3pp/2P2p2/p1n2P2/P1PNb3/2K5/4B2P/R5R1 w - - 0 29', 'd4e6', 'b8b3'),
-    ('08qTY', 'r1b1kb1r/2q2p1p/p2p1n2/1pp1p1p1/3nP1PN/PP1P3P/1BP1NP2/R2QKB1R w KQkq - 0 12', 'h4g2', 'd4f3'),
-    ('09K3K', '2r5/pp3p1p/4p3/1N2kp2/2P5/1P1K2P1/P2B3P/8 b - - 1 26', 'a7a6', 'd2c3'),
-    ('09kAc', '8/4Q2p/5ppk/p7/P3BP2/4n1PK/4q2P/8 w - - 9 49', 'e7f6', 'e2g4'),
-    ('09nQI', '6k1/8/4p2p/2b1P3/1p6/5qNp/PR1Q3B/6K1 w - - 3 36', 'd2f2', 'f3g2'),
-    ('0BWCC', '2r1k2r/npqbb1p1/4ppp1/p2pP1N1/3P4/P1N1BQ2/1P3PPP/1R3RK1 w k - 0 17', 'e5f6', 'c7h2'),
-    ('0BYqL', 'r2k1r2/1p4pQ/4R2p/p1p1b3/P4q2/BBp4P/6P1/R6K w - - 1 28', 'a3c5', 'f4h2'),
-    ('005Bm', '4rk2/p1q5/1p3Q1b/8/1p5N/2P1p3/P3P3/2K5 b - - 0 43', 'c7f7', 'h4g6'),
-    ('006pe', 'r4r2/2q1NN2/4bQpk/2n4p/pp5P/8/1PP2PP1/2KR3R b - - 0 28', 'e6f7', 'e7f5'),
-    ('009BH', '3r2k1/6p1/4Q3/4B3/1p3P2/4PKP1/3q4/8 b - - 17 51', 'g8h8', 'e6h6'),
-    ('00NUS', '4rk2/pbp2pp1/1p1b4/3P1q2/QPBPN3/1KP2P2/P5r1/R3R3 w - - 0 25', 'e4d6', 'f5c2'),
-    ('00Se9', '5rk1/pp1n2r1/3p2N1/2pQ4/2P5/4P1P1/qP2KPP1/7R b - - 1 24', 'g7f7', 'g6e7'),
-    ('00WqT', 'r4r2/1ppb1p2/p2p2pk/5P2/4P3/2PBB1R1/PKP2P1q/8 b - - 4 26', 'h6h5', 'd3e2'),
-    ('00Wyh', '2r5/8/8/pNp1r2p/3kNppP/1P1P4/2R2K2/8 b - - 2 42', 'd4d3', 'c2d2'),
-    ('00YbZ', 'b6k/8/6p1/4q2p/1Q3r1P/P1N3R1/1PP3PK/8 w - - 3 35', 'b4b6', 'f4h4'),
-    ('00ZEc', '1r3bk1/5p2/3P1qRP/r1n1p3/ppB5/P2Q1P2/1PP5/1K6 b - - 0 35', 'g8h7', 'g6g7'),
-    ('00aDl', 'r5k1/1p3p2/2p1ppp1/3p4/2nP4/1QB2B1P/rPP2PP1/qNKR3R w - - 3 22', 'f3e2', 'a1b1'),
-    ('00hSr', 'r4rk1/5p2/1q2pnRP/p2p4/1ppP4/2P1P3/PPQN1P2/2K4R b - - 0 21', 'f7g6', 'c2g6'),
-    ('00mRr', '8/2Q2kpp/1p1p2r1/1PnN4/2P1n3/6P1/1r3PK1/8 b - - 6 41', 'f7e6', 'c7e7'),
-    ('00ouE', '2r5/2r3k1/1p2pp1p/p2pQ1p1/3P4/4P1P1/PPq2P1R/KR6 w - - 0 30', 'e5e6', 'c2b1'),
-    ('00qk4', '3r4/ppN1kppp/5n2/8/1n3Nb1/4P3/1B3PPP/R3KB1R w KQ - 0 18', 'a1c1', 'b4c2'),
-    ('00rNc', '1q5r/p3kpp1/2Q1p2p/3pP2P/2n3P1/2N2P2/PrP5/K3R1NR w - - 0 26', 'g1e2', 'b2a2'),
-    ('00rqm', '2r2r1k/3b3n/p6q/1p1nN3/7P/3P2Q1/PPP2P2/1K4RR b - - 0 30', 'd7f5', 'g3g8'),
-    ('00tgU', 'r4rk1/pbpp2p1/1pn3Qp/3N4/3q1N2/3B4/PP3PPP/5RK1 b - - 5 20', 'c6e5', 'd5e7'),
-    ('00voi', '1r6/2r2p1R/7R/4pPk1/2B2n2/1P3P1P/P4K2/8 b - - 0 43', 'c7c4', 'h3h4'),
-    ('00wft', '3r2k1/pp3pp1/7p/b7/2b3Q1/P2qPN1P/3N1PP1/3RK2R w K - 0 30', 'f3e5', 'a5d2'),
-    ('00zNz', 'r1bqk2r/pp1np1bp/2p3p1/3pNB2/3P1B2/4P3/PPP2PPP/R2QK2R b KQkq - 0 10', 'g6f5', 'd1h5'),
-    ('01EMd', 'r6k/4q1pp/1n1pBp2/2p1nP2/1p2R2Q/1P5P/r5P1/2B1R1K1 b - - 6 31', 'b6d7', 'h4h7'),
-    ('01EUl', 'r2qk2r/ppp2pp1/2p2n2/7p/3bP1b1/2N3Q1/PPP2PPP/R1B1KB1R w KQkq - 0 9', 'h2h3', 'd4c3'),
-    ('01GBu', '5r1k/3p2bp/p4pp1/qp1br3/4P3/1Q4B1/PP2RPPP/4R1K1 w - - 0 23', 'e4d5', 'a5e1'),
-    ('01Hgu', '2k5/p1p5/r6q/3b4/8/3P4/PPP2P1P/R1B2RK1 w - - 0 31', 'c1h6', 'a6g6'),
-    ('01J3q', 'r3r1k1/ppq1ppb1/2p3nN/2Pp3p/3Pn2N/1P2P2P/PB3QP1/R4RK1 b - - 9 23', 'g7h6', 'f2f7'),
+    ('02Pxu', '6k1/R7/6K1/7P/8/6p1/8/7r b - - 3 58', 'g3g2', 'a7a8'),
+    ('02SWp', 'Q7/6pk/7p/6PP/8/pq6/5PK1/8 b - - 0 39', 'a3a2', 'g5g6'),
+    ('04vvt', '8/8/2p1RN2/4P1k1/3PK1P1/r7/4b3/8 w - - 7 52', 'e6c6', 'e2f3'),
+    ('05jY1', '8/8/KPk5/8/8/5P2/1r1p3P/3R4 w - - 2 47', 'b6b7', 'b2a2'),
+    ('06aAU', '8/3rk1p1/4p3/6Q1/1P3K2/r7/8/8 b - - 2 56', 'e7d6', 'g5c5'),
+    ('09vxG', '2r5/8/8/P7/1K1P2NP/4Bq2/1R6/6k1 b - - 1 62', 'g1h1', 'b2h2'),
+    ('0BrHk', '8/8/2R5/8/5Kpk/5N2/5rP1/8 b - - 2 61', 'g4f3', 'c6h6'),
+    ('0C5UE', '6Q1/1p6/7k/8/3r4/Pp6/7r/1R1K2R1 w - - 2 59', 'd1c1', 'h2c2'),
+    ('0CAJl', '8/1P6/4p1k1/6P1/1PpP3P/2K5/8/5q2 w - - 0 44', 'b7b8q', 'f1c1'),
+    ('0CAsd', '8/8/8/p7/8/3Q3P/r3r1PK/3k4 b - - 16 54', 'a2d2', 'd3b1'),
+    ('0D5c0', '8/4R3/3p2k1/6P1/1p2P1KP/8/r1p5/8 b - - 1 46', 'c2c1q', 'h4h5'),
+    ('0FLeU', '8/R3b1k1/4P3/5P1p/4P1rK/8/P7/8 w - - 4 46', 'h4h5', 'g4h4'),
+    ('0Ftzc', '6k1/R4p2/7p/4B2K/5P2/5b2/6r1/8 w - - 1 36', 'h5h6', 'g2g6'),
+    ('0Gjvb', '1k6/6R1/1P5p/5B2/5P2/5nP1/1r6/6K1 w - - 1 46', 'g1h1', 'b2h2'),
+    ('0Kk4G', '8/8/7p/2Q1Pp2/3K1P1k/2P5/8/1q6 w - - 3 47', 'e5e6', 'b1e4'),
+    ('0Ljrm', '4Q3/8/3q3k/3p2pP/4p3/7P/5P2/6K1 b - - 7 44', 'd5d4', 'e8h8'),
+    ('0MwbE', '6Q1/8/6pk/1q5p/5P2/8/1p3PK1/8 b - - 1 59', 'b2b1q', 'g8h8'),
+    ('0NS5X', '8/8/3R4/1bk2p2/4pB2/4K1P1/2r4P/8 w - - 5 43', 'd6f6', 'c2e2'),
+    ('0Og6f', '7k/7B/6K1/8/8/8/3p4/5R2 b - - 1 52', 'd2d1q', 'f1f8'),
+    ('0Qi5Z', '8/8/4k3/R3P2P/6p1/3r4/2r3PK/6R1 w - - 1 56', 'h5h6', 'd3h3'),
+    ('0QzFM', '8/6R1/4p3/4Pk2/2r2n2/P1p2K2/8/2B5 b - - 0 43', 'f4d3', 'g7g5'),
+    ('0UEEc', '7k/3q1K2/7p/7Q/8/5P2/8/8 w - - 10 44', 'f7g6', 'd7e6'),
+    ('0WC60', '8/P5R1/8/8/8/5k1p/r7/5K2 w - - 5 53', 'g7h7', 'a2a1'),
+    ('0XdVp', '6R1/8/8/1r3P1k/5K2/4p3/8/8 b - - 2 62', 'e3e2', 'g8h8'),
+    ('00FND', '8/1P6/8/7p/3P4/3k1p1P/4p3/3K4 w - - 0 49', 'd1e1', 'd3e3'),
+    ('029mV', '8/8/5k2/1p4p1/1R1P2K1/6R1/3r2b1/8 w - - 0 37', 'b4b5', 'd2d4'),
+    ('02DwR', 'k7/P7/1K6/1N6/8/4p1p1/3n4/8 b - - 1 59', 'd2c4', 'b6a6'),
+    ('02ZzV', '8/7b/8/p7/2BNpn2/k1K1p3/P7/8 b - - 9 58', 'f4d3', 'c4b3'),
+    ('02kCY', '8/8/8/7p/p1b5/P5kP/2p3P1/2B3K1 b - - 7 46', 'g3h4', 'g1h2'),
+    ('035m4', '4r3/5k2/6R1/5PP1/8/r4K2/4p3/4R3 w - - 0 37', 'f3g4', 'e8e4'),
+    ('0416t', '7k/1Q4bp/6p1/8/8/8/5RPP/q5K1 w - - 1 27', 'f2f1', 'g7d4'),
+    ('04VNP', '8/8/5pkp/6p1/8/7P/2Q3PK/q7 b - - 3 52', 'g6h5', 'g2g4'),
+    ('05t5o', '8/8/8/p1R5/6P1/1P3k2/r6P/6K1 w - - 1 39', 'g4g5', 'a2a1'),
+    ('05xMB', '8/4p2k/3p4/4b3/8/2pq4/5PR1/2Q4K w - - 0 47', 'c1g5', 'd3f1'),
+    ('06PHz', '8/8/P1p5/2P5/2P1Pk1p/7p/6p1/6K1 w - - 1 43', 'a6a7', 'f4g3'),
+    ('06fJG', '6rk/5R2/8/5BKP/3b2P1/8/8/8 w - - 11 55', 'g5h6', 'd4e3'),
+    ('07a2d', '5Q2/8/2p1k1p1/8/qP6/2PKP3/8/8 w - - 7 55', 'f8f4', 'a4d1'),
+    ('08FHm', '8/5Kpk/p1Q5/1p3P2/8/2p1q3/P7/8 b - - 3 46', 'e3g3', 'c6h1'),
+    ('09Pcz', '3k4/3P4/2P1K3/5p2/7p/6pP/8/8 b - - 0 49', 'g3g2', 'e6d6'),
+    ('09aSK', '4q3/1k6/8/1K6/2Q1N3/b7/8/8 w - - 20 69', 'b5a5', 'e8a8'),
+    ('0AbbE', '4k3/2R5/5P2/4p1B1/8/b7/r1p2PK1/8 b - - 0 40', 'e5e4', 'f6f7'),
+    ('0C9ct', '8/8/2Q5/p5p1/Pq6/1k4K1/6P1/8 w - - 4 46', 'c6d7', 'b4f4'),
+    ('0DZXq', 'Q7/6R1/2Bp4/2n5/5k2/2P1p3/1r2K3/8 w - - 0 50', 'e2d1', 'e3e2'),
+    ('0DslH', 'r7/8/5p2/7p/p5kP/R5P1/5KP1/8 b - - 4 54', 'f6f5', 'a3f3'),
+    ('0EcCu', '8/6R1/7k/8/5R2/6PK/8/3q4 w - - 4 82', 'g7g8', 'd1h1'),
+    ('0EtoC', '8/8/5k1P/6p1/6Q1/5p1K/5P2/4q3 w - - 2 49', 'h6h7', 'e1h1'),
+    ('0GzwQ', '6k1/1R6/6P1/6K1/8/6p1/7r/8 b - - 9 64', 'g3g2', 'g5f6'),
+    ('0I1wj', 'R3bk2/5n1R/6K1/8/5r1P/8/8/8 b - - 5 56', 'f4b4', 'h7f7'),
+    ('0IKWe', '8/8/8/1B6/1R6/p1P1nk2/r7/2K5 w - - 0 48', 'b4a4', 'a2a1'),
 ]
 
 
@@ -202,21 +203,23 @@ def main() -> None:
                 raise SystemExit(f"{path}: read_board does not read back the position drawn")
         side = "white" if board.turn == chess.WHITE else "black"
         legal = sorted(move.uci() for move in board.legal_moves)
-        truth.append((number, puzzle, board.fen(), side, depth, best, legal, rows))
+        checks = sorted(move.uci() for move in board.legal_moves if board.gives_check(move))
+        truth.append((number, puzzle, board.fen(), side, depth, best, legal, checks, rows))
     lines = [
         '"""Each bundled board\'s position and answers, as src/plugin/tools_dev/make_boards.py computed them from',
         "Lichess puzzles (CC0) with python-chess. Generated: do not edit.",
         "",
         "best: every move that forces checkmate in mate_in moves, the fewest possible; legal: every legal move;",
+        "checks: the legal moves that give check;",
         'rows: the position as read_board gives it."""',
         "",
         f"COUNT = {COUNT}",
         "PUZZLES = {",
     ]
-    for number, puzzle, fen, side, depth, best, legal, rows in truth:
+    for number, puzzle, fen, side, depth, best, legal, checks, rows in truth:
         lines.append(
             f"    {number}: {{'lichess': {puzzle!r}, 'fen': {fen!r}, 'to_move': {side!r}, 'mate_in': {depth}, "
-            f"'best': {tuple(best)!r}, 'legal': {tuple(legal)!r}, 'rows': {tuple(rows)!r}}},"
+            f"'best': {tuple(best)!r}, 'legal': {tuple(legal)!r}, 'checks': {tuple(checks)!r}, 'rows': {tuple(rows)!r}}},"
         )
     lines.append("}")
     TRUTH.write_text("\n".join(lines) + "\n")

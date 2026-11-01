@@ -2,8 +2,8 @@
 
 A board is 8x8 squares of SQUARE px inside a MARGIN of coordinates, white at the bottom. Every
 square is a light or dark square, empty or with one of the 12 piece sprites in ui/pieces.png drawn
-on it, so each square's pixels equal exactly one of 26 templates. A square that matches none is
-refused: the boards hold nothing else. read_board says what stands where and never which move is
+on it, so each square's pixels equal exactly one of 26 templates. The position comes back as each
+side's pieces by square. A square that matches none is refused: the boards hold nothing else. read_board says what stands where and never which move is
 best: only the verifier holds the answers.
 """
 
@@ -94,6 +94,21 @@ def _rows(number: int) -> tuple[str, ...]:
         return tuple(read_rows(image))
 
 
+ORDER = "KQRBNP"
+
+
+def pieces(rows: list[str], white: bool) -> list[str]:
+    """One side's pieces by square, e.g. ['Kd3', 'Bd2', 'Pa2']: king first, then by kind, then by square."""
+    found = [
+        (ORDER.index(char.upper()), "abcdefgh"[file] + str(8 - y), char.upper())
+        for y, row in enumerate(rows)
+        for file, char in enumerate(row)
+        if char != "." and char.isupper() == white
+    ]
+    return [letter + square for _, square, letter in sorted(found)]
+
+
 def read_board(given: BoardInput, workspace: Path) -> BoardOutput:
-    """What stands on each square of the board, read from its pixels."""
-    return BoardOutput(board=given.board, rows=list(_rows(given.board)))
+    """What stands on each square of the board, read from its pixels: each side's pieces by square."""
+    rows = list(_rows(given.board))
+    return BoardOutput(board=given.board, white=pieces(rows, True), black=pieces(rows, False))

@@ -1,7 +1,7 @@
 // How this plugin's page draws its tasks' outputs: the board image (ui/boards/) with an SVG drawn
 // over it as a data: image. A best-move answer draws the agent's move as an orange arrow and, when it
 // is not a best move, the forced mate's first move as a dashed green one, then the verdict's checks;
-// show-board shows the board and the rows the agent reads.
+// show-board shows the board and the piece lists the agent reads.
 import { disclosure, h } from "./kit/components.js";
 
 const SIZE = 496;
@@ -62,12 +62,16 @@ const checks = (constraints) =>
   );
 
 export default {
-  BoardOutput: ({ board, rows }) =>
+  BoardOutput: ({ board, white, black }) =>
     h(
       "div",
       { class: "chess-card" },
       picture(board, null),
-      disclosure({ summary: "The rows the agent reads", className: "chess-text" }, h("pre", { class: "chess-rows", text: rows.join("\n") })),
+      disclosure(
+        { summary: "What the agent reads", className: "chess-text" },
+        h("p", { class: "chess-pieces" }, h("strong", { text: "White: " }), white.join(", ")),
+        h("p", { class: "chess-pieces" }, h("strong", { text: "Black: " }), black.join(", ")),
+      ),
     ),
   MoveOutput: ({ board, to_move, move }, { verdict }) => {
     const details = verdict.details || {};

@@ -7,11 +7,10 @@ name = "nanoagent-chess-best-move"
 version = "0.1.0"
 description = "Find the best move in a chess position read from a board image, checked against every forced mate: a NanoAgent plugin"
 requires-python = ">=3.12"
-dependencies = ["mcp>=1.27,<2", "slimconfig", "pillow>=11,<13"]
+dependencies = ["mcp>=1.27,<2", "slimconfig", "pillow>=11,<13", "chess>=1.10,<2"]
 
 [project.optional-dependencies]
-# python-chess builds the puzzles and their answers (tools_dev/make_boards.py); the plugin never imports it.
-dev = ["pytest", "ruff", "chess>=1.10,<2"]
+dev = ["pytest", "ruff"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

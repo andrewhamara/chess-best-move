@@ -9,6 +9,7 @@ from slimconfig import Output
 
 class Tool(Enum):
     READ_BOARD = "read_board"
+    LEGAL_MOVES = "legal_moves"
 
 
 class Task(Enum):
@@ -22,11 +23,6 @@ class Side(Enum):
 
 
 BOARD = "A bundled board image's number, 1 to 50; each shows a position from a real game"
-ROWS = (
-    "The position as 8 rows, rank 8 first and rank 1 last, files a to h from left to right, one character per "
-    "square: K Q R B N P are white's king, queen, rook, bishop, knight and pawn, k q r b n p black's, '.' an empty "
-    "square; e.g. the first row 'r...k..r' has black rooks on a8 and h8 and the black king on e8"
-)
 MOVE = (
     "The move in UCI: the from square and the to square, e.g. e2e4 or g1f3, with the promotion piece added for a "
     "pawn reaching the last rank, e.g. e7e8q"
@@ -41,7 +37,22 @@ class BoardInput(Output):
 @dataclass
 class BoardOutput(Output):
     board: Annotated[int, BOARD]
-    rows: Annotated[list[str], ROWS]
+    white: Annotated[list[str], "White's pieces: K Q R B N P are king, queen, rook, bishop, knight, pawn; e.g. Kg1, Pe4"]
+    black: Annotated[list[str], "Black's pieces, written the same way as white's (upper case), e.g. Kg8, Pe5"]
+
+
+@dataclass
+class MovesInput(Output):
+    board: Annotated[int, BOARD]
+    to_move: Annotated[Side, "Whose turn it is"]
+
+
+@dataclass
+class MovesOutput(Output):
+    board: Annotated[int, BOARD]
+    to_move: Annotated[Side, "Whose turn it is, as given"]
+    checks: Annotated[list[str], "Every legal move that gives check, in UCI, e.g. d1h5"]
+    others: Annotated[list[str], "Every other legal move, in UCI"]
 
 
 @dataclass
@@ -59,6 +70,7 @@ class MoveOutput(Output):
 
 TOOLS = {
     Tool.READ_BOARD: (BoardInput, BoardOutput),
+    Tool.LEGAL_MOVES: (MovesInput, MovesOutput),
 }
 TASKS = {
     Task.BEST_MOVE: (MoveInput, MoveOutput),
