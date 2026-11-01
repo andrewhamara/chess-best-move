@@ -27,7 +27,8 @@ one, under a line naming both, with the verdict's checks folded away.
 ## The task
 
 The input is a board, 1 to 50, and whose turn it is (`white` or `black`),
-which an image cannot show. The agent submits the move in UCI, e.g. `g1f3` or
+which an image cannot show: **boards 1 to 25 are white to move and boards 26 to
+50 black to move.** The agent submits the move in UCI, e.g. `g1f3` or
 `e7e8q`. The best move is defined exactly: a move that forces checkmate in
 the fewest moves. Neither side can castle or capture en passant (an image
 cannot show those rights either), and every board was kept only if removing
@@ -36,9 +37,10 @@ them changes no answer.
 ## Ground truth
 
 The positions are 50 puzzles from the [Lichess puzzle
-database](https://database.lichess.org/#puzzles) (CC0): the first 50 mate-in-1
-puzzles with 8 pieces or fewer, popularity 90 or more and 2,000 plays or
-more, listed with their Lichess ids in `src/plugin/tools_dev/make_boards.py`. For
+database](https://database.lichess.org/#puzzles) (CC0): the first 25 mate-in-1
+puzzles for white and the first 25 for black with 8 pieces or fewer,
+popularity 90 or more and 2,000 plays or more, listed with their Lichess ids
+in `src/plugin/tools_dev/make_boards.py`. For
 each, the generator computes with python-chess, by exhaustive search, every
 legal move and every move that forces mate in the fewest moves, and writes
 them to `verifier/puzzles.py`. On all 50 boards that is exactly one move,

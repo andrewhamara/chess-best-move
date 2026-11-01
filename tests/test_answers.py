@@ -58,3 +58,7 @@ def test_the_legal_moves_and_the_mate_are_the_positions(number: int) -> None:
 def test_every_board_is_a_mate_in_one_of_eight_pieces_or_fewer() -> None:
     assert Counter(puzzle["mate_in"] for puzzle in PUZZLES.values()) == {1: 50}
     assert all(sum(c.isalpha() for c in p["fen"].split()[0]) <= 8 for p in PUZZLES.values())
+
+
+def test_boards_1_to_25_are_white_to_move_and_26_to_50_black() -> None:
+    assert [PUZZLES[n]["to_move"] for n in range(1, 51)] == ["white"] * 25 + ["black"] * 25

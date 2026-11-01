@@ -1,7 +1,7 @@
 _ > nanoagent.plugin.v0001.ManifestConfig:
 id: chess-best-move
 name: Chess Best Move
-version: 0.3.0
+version: 0.4.0
 status: ready
 spec: nanoagent.plugin/v0001
 
@@ -23,15 +23,15 @@ tools > dict[contract.Tool, nanoagent.plugin.v0001.ToolConfig]:
 # One entry per contract.Task; its input and output classes are contract.TASKS's.
 tasks > dict[contract.Task, nanoagent.plugin.v0001.TaskConfig]:
   best-move:
-    description: Find the mating move on a chess board image for the side to move. The agent can run out of room and end without an answer; then run this task again, up to three times, and never work out a move yourself
+    description: Find the mating move on a chess board image. Boards 1 to 25 are white to move and boards 26 to 50 black to move. The agent can run out of room and end without an answer; then run this task again, up to three times, and never work out a move yourself
     runner: agent
     tools: [read_board]
     reference: null
     instructions: |-
-      Call read_board once with the board. It lists each side's pieces by square (e.g. Kd3, Bd2, Pa2: K Q R B N P are king, queen, rook, bishop, knight, pawn). The side to move (to_move) has a checkmate in one move.
-      Do not reason, analyze or check variations. As soon as read_board answers, pick the mating move on instinct and call submit with the board and to_move, as given, and the move in UCI (from square, to square, e.g. a2a1). Your first reply after read_board must be the submit call, with no thinking before it.
+      Call read_board once with the board. It lists each side's pieces by square (e.g. Kd3, Bd2, Pa2: K Q R B N P are king, queen, rook, bishop, knight, pawn).
+      The side to move (to_move) has a checkmate in one move: exactly one of its moves checkmates the other king. Look only for that checkmate, a check the king cannot escape, block or capture. Do not analyze anything else; as soon as you see it, call submit with the board and to_move, as given, and the move in UCI (from square, to square, e.g. a2a1).
   show-board:
-    description: Show one of the board images, 1 to 50, only when the person asks to see a board; it does not find moves
+    description: Show one of the board images, 1 to 50 (1 to 25 white to move, 26 to 50 black to move), only when the person asks to see a board; it does not find moves
     runner: tool
     tools: [read_board]
     reference: null

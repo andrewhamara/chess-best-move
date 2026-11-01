@@ -21,7 +21,7 @@ class Side(Enum):
     BLACK = "black"
 
 
-BOARD = "A bundled board image's number, 1 to 50; each shows a position from a real game"
+BOARD = "A bundled board image's number, 1 to 50: boards 1 to 25 are white to move, 26 to 50 black to move"
 MOVE = (
     "The move in UCI: the from square and the to square, e.g. e2e4 or g1f3, with the promotion piece added for a "
     "pawn reaching the last rank, e.g. e7e8q"

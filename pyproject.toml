@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nanoagent-chess-best-move"
-version = "0.3.0"
+version = "0.4.0"
 description = "Find the best move in a chess position read from a board image, checked against every forced mate: a NanoAgent plugin"
 requires-python = ">=3.12"
 dependencies = ["mcp>=1.27,<2", "slimconfig", "pillow>=11,<13"]
