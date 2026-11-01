@@ -1,7 +1,8 @@
-// How this plugin's page draws its tasks' outputs: the board image (ui/boards/) with an SVG drawn
-// over it as a data: image. A best-move answer draws the agent's move as an orange arrow and, when it
-// is not a best move, the forced mate's first move as a dashed green one, then the verdict's checks;
-// show-board shows the board and the piece lists the agent reads.
+// How this plugin's page draws its outputs: the board image (ui/boards/) with an SVG drawn over it as
+// a data: image. A best-move answer leads with the agent's move and the correct one, draws the agent's
+// move as an orange arrow and, when it is wrong, the correct move as a dashed green one, with the
+// verdict's checks folded away. A consider_move card draws the move the agent is weighing, so the page
+// shows the agent's moves even when it ends without an answer; legal_moves shows a short summary.
 import { disclosure, h } from "./kit/components.js";
 
 const SIZE = 496;
@@ -62,6 +63,21 @@ const checks = (constraints) =>
   );
 
 export default {
+  MovesOutput: ({ board, to_move, checks, others }) =>
+    h(
+      "div",
+      { class: "chess-card" },
+      h("p", { class: "chess-move" }, `Board ${board}, ${to_move} to move: ${checks.length + others.length} legal moves, ${checks.length} of them checks`),
+      checks.length ? h("p", { class: "chess-pieces muted", text: `Checks: ${checks.join(", ")}` }) : null,
+    ),
+  ConsiderOutput: ({ board, to_move, move, note }) =>
+    h(
+      "div",
+      { class: "chess-card" },
+      h("p", { class: "chess-move" }, h("span", { class: "muted", text: `Board ${board}, ${to_move} to move · considering ` }), h("strong", { text: move })),
+      note ? h("p", { class: "chess-note", text: `“${note}”` }) : null,
+      picture(board, [arrow(move, AGENT, "considered", false)]),
+    ),
   BoardOutput: ({ board, white, black }) =>
     h(
       "div",
@@ -85,18 +101,25 @@ export default {
       h(
         "p",
         { class: "chess-move" },
-        h("span", { class: "muted", text: `Board ${board}, ${to_move} to move · agent's move ` }),
+        h("span", { class: "muted", text: "Agent's move " }),
         h("strong", { text: move }),
-        details.expected ? h("span", { class: "muted", text: ` · forced mate in ${details.expected.mate_in}: ${best.join(" or ")}` }) : null,
+        best.length ? h("span", { class: `chess-verdict ${right ? "ok" : "bad"}`, text: right ? " ✓" : " ✗" }) : null,
+        best.length ? h("span", { class: "muted", text: ` · correct move ${best.join(" or ")} (mate in ${details.expected.mate_in})` }) : null,
       ),
       picture(board, overlay),
       h(
         "p",
         { class: "chess-legend muted" },
         h("span", { class: "chess-key" }, h("span", { class: "chess-swatch agent" }), "the agent's move"),
-        best.length && !right ? h("span", { class: "chess-key" }, h("span", { class: "chess-swatch best" }), "the forced mate") : null,
+        best.length && !right ? h("span", { class: "chess-key" }, h("span", { class: "chess-swatch best" }), "the correct move") : null,
+        h("span", { text: `Board ${board}, ${to_move} to move` }),
       ),
-      details.constraints ? checks(details.constraints) : null,
+      details.constraints
+        ? disclosure(
+            { summary: `Checks: ${details.constraints.filter((c) => c.ok).length} of ${details.constraints.length} hold`, className: "chess-text" },
+            checks(details.constraints),
+          )
+        : null,
     );
   },
 };

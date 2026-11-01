@@ -23,7 +23,7 @@ def legal_but_not_best(number: int) -> str:
 # Correct
 
 
-@pytest.mark.parametrize("mate_in", [1, 2])
+@pytest.mark.parametrize("mate_in", [1])
 def test_approves_the_forced_mate(mate_in: int) -> None:
     n = board_with(mate_in)
     p = PUZZLES[n]
@@ -36,13 +36,13 @@ def test_approves_the_forced_mate(mate_in: int) -> None:
 
 
 def test_a_legal_move_that_does_not_mate_scores_a_quarter() -> None:
-    n = board_with(2)
+    n = board_with(1)
     p = PUZZLES[n]
     move = legal_but_not_best(n)
     verdict = judge(n, p["to_move"], move)
     assert verdict["valid"] is False and verdict["score"] == 0.25
     assert verdict["message"] == (
-        f"best: {move} is legal but does not force the fastest mate: the mate in 2 starts with {p['best'][0]}."
+        f"best: {move} is legal but does not force the fastest mate: the mate in 1 starts with {p['best'][0]}."
     )
 
 
@@ -146,3 +146,21 @@ def test_the_show_board_task_is_judged_as_its_tool() -> None:
 
 def test_the_verdict_is_the_same_twice() -> None:
     assert judge(3, "white", "a1a2") == judge(3, "white", "a1a2")
+
+
+def test_checks_consider_move_calls() -> None:
+    from contract import ConsiderInput
+    from plugin import consider_move
+
+    given, output = TOOLS[Tool.CONSIDER_MOVE]
+    side = PUZZLES[1]["to_move"]
+    asked = {"board": 1, "to_move": side, "move": PUZZLES[1]["best"][0], "note": "a check"}
+    found = plain_output(consider_move(build_output(asked, ConsiderInput), Path(".")))
+
+    def verify_output(made: dict) -> dict:
+        return verifier.verify_output("consider_move", build_output(asked, given), build_output(made, output), ".")
+
+    assert verify_output(found)["valid"] is True
+    assert "misreported" in verify_output(found | {"black": found["black"][:-1]})["message"]
+    assert verify_output(found | {"note": "another note"})["valid"] is False
+    assert not verifier.verify_input("consider_move", build_output(asked | {"note": "x" * 301}, given))["valid"]

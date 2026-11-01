@@ -10,11 +10,14 @@ from slimconfig import Output
 class Tool(Enum):
     READ_BOARD = "read_board"
     LEGAL_MOVES = "legal_moves"
+    CONSIDER_MOVE = "consider_move"
 
 
 class Task(Enum):
     BEST_MOVE = "best-move"
     SHOW_BOARD = "show-board"
+    LIST_MOVES = "list-moves"
+    CONSIDER_MOVE = "consider-move"
 
 
 class Side(Enum):
@@ -56,6 +59,24 @@ class MovesOutput(Output):
 
 
 @dataclass
+class ConsiderInput(Output):
+    board: Annotated[int, BOARD]
+    to_move: Annotated[Side, "Whose turn it is"]
+    move: Annotated[str, "One candidate move, in UCI, as legal_moves lists it"]
+    note: Annotated[str, "One short line: why this move, and what you will check in the new position"]
+
+
+@dataclass
+class ConsiderOutput(Output):
+    board: Annotated[int, BOARD]
+    to_move: Annotated[Side, "Whose turn it is, as given"]
+    move: Annotated[str, "The move considered, as given"]
+    note: Annotated[str, "Your note, as given"]
+    white: Annotated[list[str], "White's pieces after the move, by square"]
+    black: Annotated[list[str], "Black's pieces after the move, by square"]
+
+
+@dataclass
 class MoveInput(Output):
     board: Annotated[int, BOARD]
     to_move: Annotated[Side, "Whose turn it is: the side that makes the move"]
@@ -71,8 +92,11 @@ class MoveOutput(Output):
 TOOLS = {
     Tool.READ_BOARD: (BoardInput, BoardOutput),
     Tool.LEGAL_MOVES: (MovesInput, MovesOutput),
+    Tool.CONSIDER_MOVE: (ConsiderInput, ConsiderOutput),
 }
 TASKS = {
     Task.BEST_MOVE: (MoveInput, MoveOutput),
     Task.SHOW_BOARD: (BoardInput, BoardOutput),
+    Task.LIST_MOVES: (MovesInput, MovesOutput),
+    Task.CONSIDER_MOVE: (ConsiderInput, ConsiderOutput),
 }

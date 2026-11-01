@@ -2,7 +2,7 @@ _ > nanoagent.plugin.v0001.ProductConfig:
 tagline: "Find the winning move on a chess board image"
 summary: "Ask for the best move on one of 50 board images from real Lichess games, such as find the best move on board 7 with white to move."
 highlights:
-  - "Real Lichess puzzles: every board has one forced checkmate in one or two moves"
+  - "Real Lichess puzzles: every board has exactly one checkmate in one move"
   - "Each answer is checked against every legal move and every forced mate"
 steps:
   - "Ask, e.g. find the best move on board 7, white to move"

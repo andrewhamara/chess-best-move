@@ -7,11 +7,12 @@ the board's pixels and list the legal moves by the rules, and never know which m
 
 from contract import Task, Tool
 
-from . import moves, read_board, task
+from . import consider_move, moves, read_board, task
 
 TOOLS = {
     Tool.READ_BOARD: read_board,
     Tool.LEGAL_MOVES: moves,
+    Tool.CONSIDER_MOVE: consider_move,
 }
 
 
@@ -24,6 +25,8 @@ def _tool_output(module):
 TASKS = {
     Task.BEST_MOVE: task.verify_task,
     Task.SHOW_BOARD: _tool_output(read_board),
+    Task.LIST_MOVES: _tool_output(moves),
+    Task.CONSIDER_MOVE: _tool_output(consider_move),
 }
 
 
